@@ -44,7 +44,7 @@ void finalizeCommand(flo_BuildCommand *command, flo_Arena *perm) {
     // Add stuff based on relase + generate output name and where
     // add NULL at the end
 
-    *FLO_PUSH(command, perm) = NULL;
+    *FLO_PUSH(&command->commands, perm) = NULL;
 }
 
 pid_t flo_runAsync(flo_da_charPtr *command, flo_Arena *perm) {

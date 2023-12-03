@@ -12,6 +12,8 @@ typedef enum {
     FLO_BUILD_NUM
 } flo_BuildType;
 
+char *flo_buildTypeToString(flo_BuildType status);
+
 typedef struct {
     flo_da_charPtr commands;
     char *name;
