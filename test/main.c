@@ -4,24 +4,29 @@
 
 #define CAP 1 << 15
 
-pid_t runBuild(flo_Arena *perm) {
+pid_t runBuild(flo_Arena scratch, flo_BuildConfig *config) {
     flo_da_charPtr command = {0};
 
-    *FLO_PUSH(&command, perm) = "cc";
-    *FLO_PUSH(&command, perm) = "-o";
-    *FLO_PUSH(&command, perm) = "example-main";
-    *FLO_PUSH(&command, perm) = "example/main.c";
-    //    *FLO_PUSH(&command, perm) = "-Ilibs/util/include";
-    //    *FLO_PUSH(&command, perm) = "-Llibs/util/build";
-    //    *FLO_PUSH(&command, perm) = "-lutil-Release";
-    flo_addPersonalStaticLib("util", "Release", &command, perm);
-    flo_addCommonCFlags(&command, perm);
-    flo_addCommonCVersion(&command, perm);
+    flo_addConfiguration(config, &command, &scratch);
 
-    return flo_runAsync(&command, perm);
+    *FLO_PUSH(&command, &scratch) = "example/main.c";
+
+    flo_addPersonalStaticLib("util", "Release", &command, &scratch);
+    flo_addCommonCFlags(&command, &scratch);
+    flo_addCommonCVersion(&command, &scratch);
+
+    return flo_runAsync(&command, scratch);
 }
 
-int main() {
+int main([[maybe_unused]] int argc, char **argv) {
+    FLO_FLUSH_AFTER(FLO_STDOUT) {
+        FLO_INFO((FLO_STRING("-------------------------------------------------"
+                             "-------------------------------\n")));
+        FLO_INFO((FLO_STRING("Running flo/build\n")));
+        FLO_INFO((FLO_STRING("-------------------------------------------------"
+                             "-------------------------------\n")));
+    }
+
     char *begin = mmap(NULL, CAP, PROT_READ | PROT_WRITE,
                        MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (begin == MAP_FAILED) {
@@ -56,12 +61,26 @@ int main() {
     }
     arena.jmp_buf = jmp_buf;
 
-    pid_t childProcessID = runBuild(&arena);
+    // Rebuild ???
+    // yes yes
+    if (!flo_rebuild(argv[0], "test/main.c", arena)) {
+        return -1;
+    }
+
+    flo_BuildConfig buildConfig = (flo_BuildConfig){
+        .buildType = FLO_BUILD_DEBUG, .name = "build/example-main"};
+
+    pid_t childProcessID = runBuild(arena, &buildConfig);
     if (childProcessID == -1) {
         return -1;
     }
 
     bool buildResult = flo_waitPid(childProcessID);
+
+    FLO_FLUSH_AFTER(FLO_STDOUT) {
+        FLO_INFO((FLO_STRING("-------------------------------------------------"
+                             "-------------------------------\n")));
+    }
     if (buildResult) {
         FLO_FLUSH_AFTER(FLO_STDOUT) {
             FLO_INFO((FLO_STRING("Build result: ")));
@@ -76,6 +95,10 @@ int main() {
             FLO_ERROR((FLO_STRING("failure\n")));
             flo_appendColorReset(FLO_STDERR);
         }
+    }
+    FLO_FLUSH_AFTER(FLO_STDOUT) {
+        FLO_INFO((FLO_STRING("-------------------------------------------------"
+                             "-------------------------------\n")));
     }
 
     return 0;

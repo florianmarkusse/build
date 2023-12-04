@@ -20,8 +20,10 @@ extern "C" {
     flo_appendColorReset(bufferType);
 
 bool flo_waitPid(pid_t pid);
-pid_t flo_runAsync(flo_da_charPtr *command, flo_Arena *perm);
-pid_t flo_runSync(flo_da_charPtr *command, flo_Arena *perm);
+pid_t flo_runAsync(flo_da_charPtr *command, flo_Arena scratch);
+pid_t flo_runSync(flo_da_charPtr *command, flo_Arena scratch);
+
+bool flo_rebuild(char *executableName, char *buildCodeFile, flo_Arena scratch);
 
 #ifdef __cplusplus
 }

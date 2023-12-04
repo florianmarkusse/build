@@ -14,10 +14,10 @@ typedef enum {
 
 char *flo_buildTypeToString(flo_BuildType status);
 
+// TODO: add usage, i.e. executable, shared library or static library.
 typedef struct {
-    flo_da_charPtr commands;
     char *name;
     flo_BuildType buildType;
-} flo_BuildCommand;
+} flo_BuildConfig;
 
 #endif

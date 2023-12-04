@@ -7,6 +7,9 @@ extern "C" {
 
 #include "definitions.h"
 
+void flo_addConfiguration(flo_BuildConfig *config, flo_da_charPtr *command,
+                          flo_Arena *perm);
+
 void flo_addCommonCFlags(flo_da_charPtr *command, flo_Arena *perm);
 void flo_addCommonCVersion(flo_da_charPtr *command, flo_Arena *perm);
 void flo_addPersonalStaticLib(char *lib, char *buildType,

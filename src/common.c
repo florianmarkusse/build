@@ -1,5 +1,38 @@
 #include "build/common.h"
+#include "log.h"
 #include <stdio.h>
+
+void flo_addConfiguration(flo_BuildConfig *config, flo_da_charPtr *command,
+                          flo_Arena *perm) {
+    *FLO_PUSH(command, perm) = "cc";
+    *FLO_PUSH(command, perm) = "-o";
+    *FLO_PUSH(command, perm) = config->name;
+
+    switch (config->buildType) {
+    case FLO_BUILD_DEBUG: {
+        *FLO_PUSH(command, perm) = "-O0";
+        *FLO_PUSH(command, perm) = "-g3";
+        *FLO_PUSH(command, perm) = "-DDEBUG";
+        break;
+    }
+    case FLO_BUILD_PROFILING: {
+        *FLO_PUSH(command, perm) = "-pg";
+        *FLO_PUSH(command, perm) = "-O2";
+        break;
+    }
+    case FLO_BUILD_RELEASE: {
+        *FLO_PUSH(command, perm) = "-O3";
+        break;
+    }
+    default: {
+        FLO_FLUSH_AFTER(FLO_STDERR) {
+            FLO_ERROR((FLO_STRING("build type was set incorrectly: ")));
+            FLO_ERROR(flo_buildTypeToString(config->buildType));
+            FLO_ERROR((FLO_STRING(" ignoring...\n")));
+        }
+    }
+    }
+}
 
 void flo_addCommonCFlags(flo_da_charPtr *command, flo_Arena *perm) {
     *FLO_PUSH(command, perm) = "-Wall";
