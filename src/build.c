@@ -134,22 +134,16 @@ bool runRebuild(flo_Arena scratch, char *binaryName, char *buildCodeFile) {
     flo_BuildConfig config = {.name = binaryName, .buildType = FLO_BUILD_DEBUG};
     flo_da_charPtr command = {0};
 
-    *FLO_PUSH(&command, &scratch) = "bear";
-    *FLO_PUSH(&command, &scratch) = "--output";
-    *FLO_PUSH(&command, &scratch) = "build/compile_commands.json";
-    *FLO_PUSH(&command, &scratch) = "--";
     flo_addConfiguration(&config, &command, &scratch);
 
-    // TODO remove this need once we are actually building a static build lib.
-    *FLO_PUSH(&command, &scratch) = "src/build.c";
-    *FLO_PUSH(&command, &scratch) = "src/common.c";
-    *FLO_PUSH(&command, &scratch) = "src/definitions.c";
-    *FLO_PUSH(&command, &scratch) = buildCodeFile;
-    *FLO_PUSH(&command, &scratch) = "-Iinclude";
-
-    flo_addPersonalStaticLib("util", "Release", &command, &scratch);
-    flo_addCommonCFlags(&command, &scratch);
     flo_addCommonCVersion(&command, &scratch);
+
+    *FLO_PUSH(&command, &scratch) = buildCodeFile;
+
+    flo_addPersonalStaticLib("build", "Debug", &command, &scratch);
+    flo_addPersonalStaticLib("util", "Release", &command, &scratch);
+
+    flo_addCommonCFlags(&command, &scratch);
 
     return flo_runSync(&command, scratch) != -1;
 }
