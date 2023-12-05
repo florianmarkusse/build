@@ -4,7 +4,7 @@
 
 void flo_addConfiguration(flo_BuildConfig *config, flo_da_charPtr *command,
                           flo_Arena *perm) {
-    *FLO_PUSH(command, perm) = "cc";
+    *FLO_PUSH(command, perm) = "gcc";
     *FLO_PUSH(command, perm) = "-o";
     *FLO_PUSH(command, perm) = config->name;
 

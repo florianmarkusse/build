@@ -62,7 +62,6 @@ int main([[maybe_unused]] int argc, char **argv) {
     arena.jmp_buf = jmp_buf;
 
     // Rebuild ???
-    // yes yes
     if (!flo_rebuild(argv[0], "test/main.c", arena)) {
         return -1;
     }
